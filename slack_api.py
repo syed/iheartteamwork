@@ -49,6 +49,7 @@ class SlackApi():
         return None, None
 
     def send_message(self, message, channel):
+
         self.slack_client.api_call("chat.postMessage", channel=channel,
                           text=message, as_user=True)
 
