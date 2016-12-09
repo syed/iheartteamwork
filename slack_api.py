@@ -1,16 +1,8 @@
-import os
 import time
 from slackclient import SlackClient
 
-# constants
-EXAMPLE_COMMAND = "do"
-
-
-
-class SlackApi():
-
+class SlackApi:
     def __init__(self, bot_name, api_token):
-
         # instantiate Slack & Twilio clients
         self.bot_name = bot_name
         self.slack_client = SlackClient(api_token)
@@ -18,7 +10,6 @@ class SlackApi():
         self.AT_BOT = "<@" + self.bot_id + ">"
 
     def _get_bot_id(self):
-
         api_call = self.slack_client.api_call("users.list")
         if api_call.get('ok'):
             # retrieve all users so we can find our bot
@@ -30,32 +21,28 @@ class SlackApi():
         else:
             raise Exception("could not find bot user with the name " + BOT_NAME)
 
-
     def parse_slack_output(self, slack_rtm_output):
         """
             The Slack Real Time Messaging API is an events firehose.
             this parsing function returns None unless a message is
             directed at the Bot, based on its ID.
         """
-
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
             for output in output_list:
                 if output and 'text' in output and self.AT_BOT in output['text']:
                     # return text after the @ mention, whitespace removed
-                    return output['text'].split(self.AT_BOT)[1].strip().lower(), \
+                    return output['text'].split(self.AT_BOT)[1].strip(), \
                            output['channel']
 
         return None, None
 
     def send_message(self, message, channel):
-
         self.slack_client.api_call("chat.postMessage", channel=channel,
-                          text=message, as_user=True)
+                                   text=message, as_user=True)
 
     def start_bot(self, callback_fn):
-
-        READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
+        READ_WEBSOCKET_DELAY = 1  # 1 second delay between reading from firehose
         if self.slack_client.rtm_connect():
             print("Teamworker connected and running!")
             while True:
