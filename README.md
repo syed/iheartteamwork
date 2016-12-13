@@ -6,6 +6,9 @@ Currently the bot supports updating time on teamwork. It also can list projects 
 
 # Installation
 
+**NOTE:** This script uses a modified version of python-teamwork which has support for
+tasks. Install that from [Here](https://github.com/syed/python-teamwork).
+
 Create a bot user on your slack named `iheartteamwork`.
 Clone the repo and run the `iheartteamwork.py` script
 
@@ -21,5 +24,3 @@ $ python iheartteamwork.py --bot_name=iheartteamwork \
 
 Once the script starts running. You will see the user `iheartteamwork` online in your slack. 
 PM `help` to the bot to give a list of its capabilities.
-
-
