@@ -27,13 +27,14 @@ class SlackApi:
             this parsing function returns None unless a message is
             directed at the Bot, based on its ID.
         """
+
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
             for output in output_list:
-                if output and 'text' in output and self.AT_BOT in output['text']:
+                # print output
+                if output and 'text' in output and 'user' in output and output['user'] != self.bot_id:
                     # return text after the @ mention, whitespace removed
-                    return output['text'].split(self.AT_BOT)[1].strip(), \
-                           output['channel']
+                    return output['text'].strip(), output['user']
 
         return None, None
 

@@ -23,6 +23,19 @@ from docopt import docopt
 from slack_api import SlackApi
 from teamwork_api import TeamWorkApi
 
+HELP_TEXT = """
+```
+update project:<project-name> task:<task-name> date:<YYYY-MM-DD> duration:<time in hrs> billable:true user:<emailid>
+show projects
+show projects like <keyword>
+list tasks <project_name>
+
+Example:
+
+    update project:CloudOps task:ACS date:2016-01-01 duration:8 billable:true user:sahmed@cloudops.com
+
+```
+"""
 
 class IHeartTeamwork:
     COMMANDS = ['help', 'update-time']
@@ -33,14 +46,18 @@ class IHeartTeamwork:
         self.tw = TeamWorkApi(teamwork_url, teamwork_api_token)
 
     def execute_help(self):
-        help_text = [
-            "Hello! I'm here to help you update teamwork.",
-            "The following commands are valid:",
-            "\t`update-time project:<project-name> task:<task-name> date:<YYYY-MM-DD> duration:<time in hrs> billable:true user:<emailid> description:string`",
-            "example:",
-            "\t`update-time project:CloudOps task:ACS date:2016-01-01 duration:8 billable:true user:sahmed@cloudops.com description:work`"]
+        return HELP_TEXT
 
-        return '\n'.join(help_text)
+    def execute_show_projects(self, keyword=None):
+        return "```" + '\n'.join([x.get('name') for x in self.tw.list_projects()]) + "```"
+
+    def execute_show_tasks(self, project_name):
+        project_id = self._get_project_id(project_name)
+
+        if not project_id:
+            return "No project %s found " % project_name
+
+        return "```" + '\n'.join([x.get('content') for x in self.tw.get_project_tasks(project_id)]) + "```"
 
     def parse_args(self, items):
 
@@ -126,22 +143,28 @@ class IHeartTeamwork:
             return False
         return True
 
-    def parse_command(self, command, channel_name):
+    def parse_slack_command(self, command, channel_name):
         """
         Main function which gets executed. Will send
         a message that will be posed back to the channel
 
         """
-        
+
         command = self._clean_string(command)
         items = shlex.split(command)
-        cmd = items[0]
-
-        if cmd == 'help' or cmd not in IHeartTeamwork.COMMANDS:
+        print items
+        
+        if command.startswith('help'):
             response = self.execute_help()
-        elif cmd == 'update-time':
+        elif command.startswith('update'):
             args = self.parse_args(items)
             response = self.execute_update_time(args)
+        elif command.startswith('show projects'):
+            args = self.parse_args(items)
+            response = self.execute_show_projects()
+        elif command.startswith('show tasks'):
+            args = self.parse_args(items)
+            response = self.execute_show_tasks(items[2])
         else:
             response = self.execute_help()
 
@@ -177,7 +200,7 @@ class IHeartTeamwork:
         return None
 
     def start(self):
-        self.slack.start_bot(self.parse_command)
+        self.slack.start_bot(self.parse_slack_command)
 
 
 if __name__ == "__main__":
