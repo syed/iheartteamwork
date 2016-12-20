@@ -43,7 +43,7 @@ class SlackApi:
                                    text=message, as_user=True)
 
     def start_bot(self, callback_fn):
-        READ_WEBSOCKET_DELAY = 1  # 1 second delay between reading from firehose
+        READ_WEBSOCKET_DELAY = 0.5  # 1 second delay between reading from firehose
         if self.slack_client.rtm_connect():
             print("Teamworker connected and running!")
             while True:

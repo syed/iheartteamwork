@@ -28,7 +28,7 @@ HELP_TEXT = """
 update project:<project-name> task:<task-name> date:<YYYY-MM-DD> duration:<time in hrs> billable:true user:<emailid>
 show projects
 show projects like <keyword>
-list tasks <project_name>
+show tasks <project_name>
 
 Example:
 
